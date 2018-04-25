@@ -57,7 +57,7 @@ RUN (/usr/bin/mysqld_safe &); \
 
 COPY zones.cfg /opt/zones.cfg
 COPY nginx_default.conf /etc/nginx/sites-available/default
-RUN pip install cs
+RUN pip install cs==1.1.1
 COPY run.sh /opt/run.sh
 COPY supervisord.conf /etc/supervisor/conf.d/supervisord.conf
 

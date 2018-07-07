@@ -5,7 +5,7 @@ MAINTAINER "René Moser" <mail@renemoser.net>
 RUN echo 'mysql-server mysql-server/root_password password root' | debconf-set-selections; \
     echo 'mysql-server mysql-server/root_password_again password root' | debconf-set-selections;
 
-RUN apt-get -y update && apt-get install -y \
+RUN apt-get -y update && apt-get dist-upgrade -y && apt-get install -y \
     genisoimage \
     libffi-dev \
     libssl-dev \
@@ -38,7 +38,7 @@ RUN mkdir -p /var/run/mysqld; \
 
 RUN (/usr/bin/mysqld_safe &); sleep 5; mysqladmin -u root -proot password ''
 
-RUN wget https://github.com/apache/cloudstack/archive/4.9.2.0.tar.gz -O /opt/cloudstack.tar.gz; \
+RUN wget https://github.com/apache/cloudstack/archive/4.11.1.0.tar.gz -O /opt/cloudstack.tar.gz; \
     mkdir -p /opt/cloudstack; \
     tar xvzf /opt/cloudstack.tar.gz -C /opt/cloudstack --strip-components=1
 
@@ -57,9 +57,12 @@ RUN (/usr/bin/mysqld_safe &); \
 
 COPY zones.cfg /opt/zones.cfg
 COPY nginx_default.conf /etc/nginx/sites-available/default
-RUN pip install cs==1.1.1
+RUN pip install cs==2.3.1
 COPY run.sh /opt/run.sh
+COPY deploy.sh /opt/deploy.sh
 COPY supervisord.conf /etc/supervisor/conf.d/supervisord.conf
+
+RUN /opt/deploy.sh
 
 EXPOSE 8888 8080 8096
 

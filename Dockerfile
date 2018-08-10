@@ -2,6 +2,8 @@ FROM ubuntu:16.04
 
 MAINTAINER "René Moser" <mail@renemoser.net>
 
+ARG src_url=https://github.com/apache/cloudstack/archive/4.11.1.0.tar.gz
+
 RUN echo 'mysql-server mysql-server/root_password password root' | debconf-set-selections; \
     echo 'mysql-server mysql-server/root_password_again password root' | debconf-set-selections;
 
@@ -38,7 +40,7 @@ RUN mkdir -p /var/run/mysqld; \
 
 RUN (/usr/bin/mysqld_safe &); sleep 5; mysqladmin -u root -proot password ''
 
-RUN wget https://github.com/apache/cloudstack/archive/4.11.1.0.tar.gz -O /opt/cloudstack.tar.gz; \
+RUN wget $src_url -O /opt/cloudstack.tar.gz; \
     mkdir -p /opt/cloudstack; \
     tar xvzf /opt/cloudstack.tar.gz -C /opt/cloudstack --strip-components=1
 

@@ -1,4 +1,4 @@
-FROM ubuntu:16.04
+FROM ubuntu:xenial-20180808
 
 MAINTAINER "René Moser" <mail@renemoser.net>
 

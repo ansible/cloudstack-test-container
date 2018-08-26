@@ -1,4 +1,7 @@
 build:
+	docker build -t cloudstack-sim .
+
+build-no-cache:
 	docker build --no-cache -t cloudstack-sim .
 
 clean:

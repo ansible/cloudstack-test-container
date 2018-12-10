@@ -11,8 +11,8 @@ done
 sleep 3
 
 export CLOUDSTACK_ENDPOINT=http://127.0.0.1:8096
-export CLOUDSTACK_KEY=""
-export CLOUDSTACK_SECRET=""
+export CLOUDSTACK_KEY=dummy
+export CLOUDSTACK_SECRET=dummy
 
-admin_id="$(cs listUsers account=admin | jq .user[0].id)"
-cs getUserKeys id=$admin_id | jq .userkeys > /var/www/html/admin.json
+admin_id="$(cs listUsers account=admin | jq '.user[0].id')"
+cs getUserKeys id=$admin_id | jq '.userkeys' > /var/www/html/admin.json

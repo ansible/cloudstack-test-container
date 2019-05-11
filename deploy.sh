@@ -1,6 +1,6 @@
 #!/bin/bash +x
+supervisorctl start mysql
 
-/usr/bin/mysqld_safe &
 cd /opt/cloudstack && mvn -pl client jetty:run -Dsimulator -Dorg.eclipse.jetty.annotations.maxWait=120 &
 
 until nc -z localhost 8096; do
@@ -21,3 +21,5 @@ cs updateConfiguration name=hypervisor.list value=Simulator
 # Workaround for Nuage VPC Offering
 vpc_offering_id="$(cs listVPCOfferings name=Nuage | jq '.vpcoffering[0].id')"
 cs updateVPCOffering id=$vpc_offering_id state=Disabled
+
+supervisorctl stop mysql

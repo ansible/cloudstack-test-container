@@ -18,6 +18,3 @@ export CLOUDSTACK_SECRET=dummy
 # Add Simulator to supported hypervisors exclusively
 cs updateConfiguration name=hypervisor.list value=Simulator
 
-# Workaround for Nuage VPC Offering
-vpc_offering_id="$(cs listVPCOfferings name=Nuage | jq '.vpcoffering[0].id')"
-cs updateVPCOffering id=$vpc_offering_id state=Disabled

@@ -56,11 +56,11 @@ RUN (/usr/bin/mysqld_safe &); \
     mvn -Pdeveloper -pl developer -Ddeploydb; \
     mvn -Pdeveloper -pl developer -Ddeploydb-simulator; \
     MARVIN_FILE=$(find /opt/cloudstack/tools/marvin/dist/ -name "Marvin*.tar.gz"); \
-    pip install $MARVIN_FILE;
+    pip install --no-cache-dir setuptools-rust $MARVIN_FILE;
 
 COPY zones.cfg /opt/zones.cfg
 COPY nginx_default.conf /etc/nginx/sites-available/default
-RUN pip install cs==2.5
+RUN pip install --no-cache-dir cs==2.5
 COPY run.sh /opt/run.sh
 COPY deploy.sh /opt/deploy.sh
 COPY supervisord.conf /etc/supervisor/conf.d/supervisord.conf

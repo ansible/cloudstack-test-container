@@ -27,8 +27,8 @@ RUN apt-get -qq update && apt-get -qq dist-upgrade && apt-get install -qq -y --n
     jq \
     mysql-server \
     openssh-client \
-    && apt-get clean all \
-    && rm -rf /var/lib/apt/lists/*;
+    build-essential \
+    && apt-get clean all && rm -rf /var/lib/apt/lists/*;
 
 
 # TODO: check if and why this is needed
@@ -59,7 +59,10 @@ RUN (/usr/bin/mysqld_safe &); \
     sleep 5; \
     mvn -Pdeveloper -pl developer -Ddeploydb; \
     mvn -Pdeveloper -pl developer -Ddeploydb-simulator; \
-    mvn -Pdeveloper,marvin -pl :cloud-marvin -Dmarvin.config=/opt/zones.cfg
+    mvn -Pdeveloper,marvin -pl :cloud-marvin; \
+    MARVIN_FILE=$(find /opt/cloudstack/tools/marvin/dist/ -name "Marvin*.tar.gz"); \
+    pip install wheel; \
+    pip install $MARVIN_FILE;
 
 COPY nginx_default.conf /etc/nginx/sites-available/default
 RUN pip install cs

@@ -1,8 +1,8 @@
-FROM ubuntu:bionic
+FROM ubuntu:22.04
 
 ENV DEBIAN_FRONTEND noninteractive
 
-ARG src_url=https://github.com/apache/cloudstack/archive/4.15.2.0-RC20210907T1815.tar.gz
+ARG src_url=https://github.com/apache/cloudstack/archive/refs/tags/4.17.2.0.tar.gz
 
 RUN echo 'mysql-server mysql-server/root_password password root' | debconf-set-selections; \
     echo 'mysql-server mysql-server/root_password_again password root' | debconf-set-selections;
@@ -16,11 +16,12 @@ RUN apt-get -qq update && apt-get -qq dist-upgrade && apt-get install -qq -y --n
     maven \
     netcat \
     openjdk-11-jdk \
-    python-dev \
-    python-mysql.connector \
-    python-pip \
-    python-setuptools \
-    python-paramiko \
+    python3 \
+    python3-dev \
+    python3-mysql.connector \
+    python3-pip \
+    python3-setuptools \
+    python3-paramiko \
     supervisor \
     wget \
     nginx \
@@ -28,6 +29,8 @@ RUN apt-get -qq update && apt-get -qq dist-upgrade && apt-get install -qq -y --n
     mysql-server \
     openssh-client \
     build-essential \
+    npm \
+    nodejs \
     && apt-get clean all && rm -rf /var/lib/apt/lists/*;
 
 
@@ -36,10 +39,8 @@ RUN mkdir -p /root/.ssh \
     && chmod 0700 /root/.ssh \
     && ssh-keygen -t rsa -N "" -f id_rsa.cloud
 
- RUN mkdir -p /var/run/mysqld; \
-     chown mysql /var/run/mysqld;
-# Still needed?
-#      echo '''sql_mode = "STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION"''' >> /etc/mysql/mysql.conf.d/mysqld.cnf
+RUN mkdir -p /var/run/mysqld; \
+    chown mysql /var/run/mysqld;
 
 RUN (/usr/bin/mysqld_safe &); sleep 5; mysqladmin -u root -proot password ''
 
@@ -49,6 +50,7 @@ RUN wget $src_url -O /opt/cloudstack.tar.gz; \
 
 WORKDIR /opt/cloudstack
 
+RUN ln -s /usr/bin/python3 /usr/local/bin/python
 RUN mvn -Pdeveloper -Dsimulator -DskipTests clean install
 RUN mvn -Pdeveloper -Dsimulator dependency:go-offline
 RUN mvn -pl client jetty:run -Dsimulator -Djetty.skip -Dorg.eclipse.jetty.annotations.maxWait=120
@@ -69,6 +71,8 @@ RUN pip install cs
 COPY run.sh /opt/run.sh
 COPY deploy.sh /opt/deploy.sh
 COPY supervisord.conf /etc/supervisor/conf.d/supervisord.conf
+
+RUN cd ui && npm install && npm run build
 
 RUN /opt/deploy.sh
 

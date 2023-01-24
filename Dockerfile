@@ -7,7 +7,7 @@ ARG src_url=https://github.com/apache/cloudstack/archive/refs/tags/4.17.2.0.tar.
 RUN echo 'mysql-server mysql-server/root_password password root' | debconf-set-selections; \
     echo 'mysql-server mysql-server/root_password_again password root' | debconf-set-selections;
 
-RUN apt-get -qq update && apt-get -qq dist-upgrade && apt-get install -qq -y --no-install-recommends \
+RUN apt-get -y update && apt-get install -y --no-install-recommends \
     genisoimage \
     libffi-dev \
     libssl-dev \

@@ -50,7 +50,6 @@ stages:
         strategy:
           matrix:
             x86_64: {}
-            aarch64: {}
 
   - stage: Deploy
     dependsOn: Build
@@ -69,7 +68,6 @@ stages:
               --push
               --tag "$(container_name):$(Build.SourceBranchName)"
               "$(scratchpad_tag)-x86_64"
-              "$(scratchpad_tag)-aarch64"
             displayName: Merge
             env:
               CONTAINMINT_PASSWORD: $(CONTAINMINT_PASSWORD)

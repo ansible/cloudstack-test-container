@@ -1,12 +1,73 @@
 trigger:
-  - master
+  batch: true
+  branches:
+    include:
+      - main
+      - stable-*
+  tags:
+    include:
+      - '*'
 
 pr:
-  - master
+  branches:
+    include:
+      - main
+      - stable-*
 
 pool:
-  vmImage: 'ubuntu-18.04'
+  vmImage: 'ubuntu-22.04'
 
-steps:
-  - script: docker build .
-    displayName: Build Container
+variables:
+  container_name: "quay.io/ansible/$(System.TeamProject)"
+  scratchpad_tag: "quay.io/ansible/scratchpad:$(System.TeamProject)-$(Build.SourceBranchName)-$(Build.BuildId)"
+  python_version: '3.10'
+  containmint_version: '0.2.0'
+  ${{ if ne(variables['Build.Reason'], 'PullRequest') }}:
+    push_or_no_login: --push
+  ${{ else }}:
+    push_or_no_login: --no-login
+
+stages:
+  - stage: Build
+    dependsOn: []
+    jobs:
+      - job: Arch
+        steps:
+          - task: UsePythonVersion@0
+            inputs:
+              versionSpec: '$(python_version)'
+            displayName: Use Python
+          - script: pip install containmint==$(containmint_version) --disable-pip-version-check --user
+            displayName: Install containmint
+          - script: >
+              containmint build
+              --tag "$(scratchpad_tag)-$(System.JobName)"
+              --arch "$(System.JobName)"
+              $(push_or_no_login)
+            displayName: Build
+            env:
+              CONTAINMINT_PASSWORD: $(CONTAINMINT_PASSWORD)
+        strategy:
+          matrix:
+            x86_64: {}
+
+  - stage: Deploy
+    dependsOn: Build
+    condition: and(succeeded(), ne(variables['Build.Reason'], 'PullRequest'))
+    jobs:
+      - job: Image
+        steps:
+          - task: UsePythonVersion@0
+            inputs:
+              versionSpec: '$(python_version)'
+            displayName: Use Python
+          - script: pip install containmint==$(containmint_version) --disable-pip-version-check --user
+            displayName: Install containmint
+          - script: >
+              containmint merge
+              --push
+              --tag "$(container_name):$(Build.SourceBranchName)"
+              "$(scratchpad_tag)-x86_64"
+            displayName: Merge
+            env:
+              CONTAINMINT_PASSWORD: $(CONTAINMINT_PASSWORD)

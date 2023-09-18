@@ -2,7 +2,7 @@ FROM quay.io/bedrock/ubuntu:22.04
 
 ENV DEBIAN_FRONTEND noninteractive
 
-ARG src_url=https://github.com/apache/cloudstack/archive/refs/tags/4.18.0.0.tar.gz
+ARG src_url=https://github.com/apache/cloudstack/archive/refs/tags/4.18.1.0.tar.gz
 
 RUN echo 'mysql-server mysql-server/root_password password root' | debconf-set-selections; \
     echo 'mysql-server mysql-server/root_password_again password root' | debconf-set-selections;

@@ -1,4 +1,4 @@
-FROM quay.io/bedrock/ubuntu:22.04
+FROM public.ecr.aws/docker/library/ubuntu:22.04
 
 ENV DEBIAN_FRONTEND noninteractive
 

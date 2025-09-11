@@ -1,17 +1,17 @@
 build:
-	docker build -t cloudstack-sim .
+	podman build -t cloudstack-sim .
 
 build-no-cache:
-	docker build --no-cache -t cloudstack-sim .
+	podman build --no-cache -t cloudstack-sim .
 
 clean:
-	docker rm -f cloudstack-sim
+	podman rm -f cloudstack-sim
 
 run:
-	docker run --name cloudstack-sim -d -p 8080:8080 -p 8888:8888 cloudstack-sim
+	podman run --name cloudstack-sim -d -p 8080:8080 -p 8888:8888 cloudstack-sim
 
 shell:
-	docker exec -it cloudstack-sim /bin/bash
+	podman exec -it cloudstack-sim /bin/bash
 
 logs:
-	docker logs -f cloudstack-sim
+	podman logs -f cloudstack-sim
